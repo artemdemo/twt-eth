@@ -15,14 +15,14 @@ contract TweetAccount {
 	mapping (uint => Tweet) tweets;
 
     // total number of tweets in the above tweets mapping
-	uint numberOfTweets;
+	uint totalTweets;
 	
 	// "owner" of this account: only admin is allowed to tweet
 	address adminAddress;
 	
 	// constructor
 	function TweetAccount() {
-		numberOfTweets = 0;
+		totalTweets = 0;
 		adminAddress = msg.sender;
     }
 
@@ -30,18 +30,21 @@ contract TweetAccount {
         if (adminAddress != msg.sender) {
             revert();
         }
+        _;
     }
 
     // create new tweet
-	function tweet(string tweetString) isOwner returns (int) {
+	function tweet(string tweetString) isOwner returns (int errorStatus, uint tweetId) {
 		if (bytes(tweetString).length > 160) {
 			// tweet contains more than 160 bytes
-			return -2;
+			errorStatus = -2;
+			tweetId = 0;
 		} else {
-			tweets[numberOfTweets].timestamp = now;
-			tweets[numberOfTweets].tweetString = tweetString;
-			numberOfTweets++;
-            return 0;
+			tweets[totalTweets].timestamp = block.timestamp;
+			tweets[totalTweets].tweetString = tweetString;
+            errorStatus = 0;
+			tweetId = totalTweets;
+			totalTweets++;
 		}
 	}
 
@@ -51,10 +54,9 @@ contract TweetAccount {
 		timestamp = tweets[tweetId].timestamp;
 	}
 	
-	function getLatestTweet() constant returns (string tweetString, uint timestamp, uint numberOfTweets) {
-		// returns three values
-		tweetString = tweets[numberOfTweets - 1].tweetString;
-		timestamp = tweets[numberOfTweets - 1].timestamp;
-		numberOfTweets = numberOfTweets;
+	function getLatestTweet() constant returns (string tweetString, uint timestamp) {
+		// returns two values
+		tweetString = tweets[totalTweets - 1].tweetString;
+		timestamp = tweets[totalTweets - 1].timestamp;
 	}
 }
