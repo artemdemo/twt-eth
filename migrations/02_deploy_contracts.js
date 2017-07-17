@@ -1,4 +1,4 @@
-const TweetAccount = artifacts.require("./MetaCoin.sol");
+const TweetAccount = artifacts.require('./TweetAccount.sol');
 
 module.exports = function(deployer) {
     deployer.deploy(TweetAccount);
